@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hành Trình Khỉ Con Bắt Chuối</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #2b580c;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 154, 103, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(212, 227, 74, 0.3) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 4px);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 0 0 3px rgba(255,255,255,0.7);
+            border: 2px solid #a3e635;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1), inset 0 0 0 2px rgba(255,255,255,0.5);
+        }
+
+        .btn-pixar {
+            background: linear-gradient(to bottom, #ff9a44, #fc6076);
+            color: white;
+            border-radius: 999px;
+            box-shadow: 0 6px 0 #d93854, 0 10px 15px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .btn-pixar:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 #d93854, 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .option-btn {
+            background: white;
+            border: 3px solid #e2e8f0;
+            border-radius: 16px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+            border-color: #3b82f6;
+            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.2);
+        }
+        .option-btn.correct {
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #166534;
+        }
+        .option-btn.wrong {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating { animation: float 3s ease-in-out infinite; }
+        
+        @keyframes bounce-in {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        .animate-bounce-in { animation: bounce-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        .svg-monkey {
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));
+        }
+
+        /* Fraction styling */
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 0.1rem;
+            font-size: 0.85em;
+            line-height: 1.2;
+        }
+        .frac .num {
+            border-bottom: 2px solid currentColor;
+            padding: 0 0.2rem;
+        }
+        .frac .den {
+            padding: 0 0.2rem;
+        }
+        .mix {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+        }
+        .mix-int {
+            margin-right: 0.1rem;
+        }
+
+        .progress-bar-inner {
+            transition: width 1s linear;
+        }
+
+        /* Thêm hiệu ứng AI đang suy nghĩ */
+        .typing-indicator::after {
+            content: '.';
+            animation: typing 1.5s infinite steps(4, end);
+        }
+        @keyframes typing {
+            0%, 100% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+        }
+
+        /* Ẩn các màn hình */
+        .hidden-screen { display: none !important; }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 text-slate-800">
+
+    <div id="start-screen" class="glass-panel w-full max-w-lg p-8 flex flex-col items-center animate-bounce-in text-center relative overflow-hidden">
+        <div class="absolute -top-10 -left-10 text-7xl opacity-30">🌿</div>
+        <div class="absolute -bottom-10 -right-10 text-7xl opacity-30">🍌</div>
+        
+        <div class="mb-4 floating">
+            <svg class="svg-monkey" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- Ears -->
+                <circle cx="40" cy="90" r="25" fill="#8B4513" />
+                <circle cx="40" cy="90" r="15" fill="#DEB887" />
+                <circle cx="160" cy="90" r="25" fill="#8B4513" />
+                <circle cx="160" cy="90" r="15" fill="#DEB887" />
+                <!-- Head Base -->
+                <ellipse cx="100" cy="100" rx="70" ry="65" fill="#8B4513" />
+                <!-- Face Area -->
+                <path d="M 50 100 Q 50 50 100 50 Q 150 50 150 100 Q 160 140 100 150 Q 40 140 50 100 Z" fill="#DEB887" />
+                <!-- Eyes -->
+                <circle cx="75" cy="85" r="12" fill="white" />
+                <circle cx="75" cy="85" r="6" fill="black" />
+                <circle cx="125" cy="85" r="12" fill="white" />
+                <circle cx="125" cy="85" r="6" fill="black" />
+                <!-- Eye glints -->
+                <circle cx="72" cy="82" r="3" fill="white" />
+                <circle cx="122" cy="82" r="3" fill="white" />
+                <!-- Nose & Mouth -->
+                <ellipse cx="100" cy="115" rx="10" ry="6" fill="#8B4513" />
+                <path d="M 85 130 Q 100 145 115 130" fill="transparent" stroke="#8B4513" stroke-width="4" stroke-linecap="round" />
+            </svg>
+        </div>
+
+        <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-lime-600 to-green-500 mb-2">
+            Hành Trình Khỉ Con
+        </h1>
+        <h2 class="text-xl font-bold text-orange-500 mb-6">Khám Phá Rừng Số Thập Phân</h2>
+        
+        <div class="w-full mb-6">
+            <label class="block text-left font-bold mb-2 text-slate-600">Nhập tên của chiến binh khỉ:</label>
+            <input type="text" id="player-name" placeholder="Ví dụ: Tôn Ngộ Không" class="w-full px-4 py-3 rounded-xl border-2 border-blue-200 focus:border-blue-500 focus:outline-none text-lg font-bold text-center">
+        </div>
+
+        <button onclick="startGame()" class="btn-pixar w-full py-4 text-2xl font-black uppercase tracking-wider">
+            Bắt đầu đi cảnh! 🚀
+        </button>
+        
+        <div class="mt-6 text-sm font-semibold text-slate-500 bg-white/50 p-4 rounded-xl">
+            👩‍🏫 <span class="text-blue-600">Cô Tiến AI:</span> "Cô sẽ đồng hành cùng con qua 20 thử thách về Số Thập Phân. Tự tin lên nhé!"
+        </div>
+    </div>
+
+    <div id="game-screen" class="glass-panel w-full max-w-2xl p-6 md:p-8 flex flex-col hidden-screen relative">
+        <!-- Header: Stats -->
+        <div class="flex justify-between items-center mb-6 bg-white/50 p-3 rounded-2xl">
+            <div class="flex items-center gap-2 font-bold text-lg text-blue-600">
+                👤 <span id="display-name">Người chơi</span>
+            </div>
+            <div class="flex items-center gap-2 font-black text-2xl text-orange-500">
+                🍌 <span id="score">0</span>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mb-2 flex justify-between text-sm font-bold text-slate-500">
+            <span id="level-badge" class="px-2 py-1 bg-green-100 text-green-700 rounded-lg">Mức 1: Nhận biết</span>
+            <span id="question-counter">Câu 1/20</span>
+        </div>
+        <div class="w-full bg-slate-200 rounded-full h-3 mb-6 overflow-hidden">
+            <div id="progress-bar" class="bg-gradient-to-r from-blue-400 to-green-400 h-3 rounded-full transition-all duration-300 w-0"></div>
+        </div>
+
+        <!-- Timer -->
+        <div class="flex items-center justify-center mb-6">
+            <div class="relative w-20 h-20 flex items-center justify-center bg-white rounded-full shadow-inner border-4 border-slate-100">
+                <span id="timer-text" class="text-3xl font-black text-slate-700">20</span>
+                <svg class="absolute top-0 left-0 w-full h-full transform -rotate-90">
+                    <circle cx="40" cy="40" r="36" stroke="#e2e8f0" stroke-width="4" fill="none"></circle>
+                    <circle id="timer-circle" cx="40" cy="40" r="36" stroke="#ef4444" stroke-width="4" fill="none" stroke-dasharray="226" stroke-dashoffset="0" class="transition-all duration-1000 linear"></circle>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Question -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 border-2 border-slate-100 text-center min-h-[120px] flex items-center justify-center">
+            <h3 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800">Câu hỏi sẽ hiện ở đây</h3>
+        </div>
+
+        <!-- Options -->
+        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Render via JS -->
+        </div>
+    </div>
+
+    <div id="feedback-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full animate-bounce-in shadow-2xl relative overflow-hidden border-4 border-blue-400">
+            <!-- Cô Tiến Avatar -->
+            <div class="absolute -top-4 -right-4 w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-5xl border-4 border-white shadow-lg floating">
+                👩‍🏫
+            </div>
+            
+            <div class="pr-16 mb-4">
+                <h2 id="feedback-title" class="text-2xl font-black mb-1">Tuyệt vời!</h2>
+                <p id="feedback-subtitle" class="text-sm font-bold text-slate-500">Khỉ con nhận được 10 quả chuối!</p>
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 mb-6">
+                <p id="feedback-explanation" class="text-slate-700 font-semibold leading-relaxed">
+                    Lời giải thích của cô Tiến...
+                </p>
+            </div>
+
+            <button onclick="nextQuestion()" class="btn-pixar w-full py-3 text-xl font-bold uppercase">
+                Tiếp tục hành trình ➡️
+            </button>
+        </div>
+    </div>
+
+    <div id="end-screen" class="glass-panel w-full max-w-lg p-8 flex flex-col items-center hidden-screen animate-bounce-in">
+        <div class="text-6xl mb-4 floating">🏆</div>
+        <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500 mb-2 text-center">
+            Tổng Kết Hành Trình
+        </h1>
+        
+        <div class="bg-white p-6 rounded-2xl w-full text-center shadow-sm border-2 border-slate-100 mb-6">
+            <p class="text-lg font-bold text-slate-500 mb-1">Thành tích của Khỉ Con</p>
+            <p id="final-player-name" class="text-2xl font-black text-blue-600 mb-2">Tên</p>
+            <div class="flex items-center justify-center gap-2 text-4xl font-black text-orange-500">
+                🍌 <span id="final-score">0</span>
+            </div>
+            <p id="final-message" class="mt-4 text-green-600 font-bold">Cô Tiến rất tự hào về con!</p>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="w-full bg-slate-50 rounded-2xl p-4 border border-slate-200 mb-6">
+            <h3 class="text-center font-bold text-slate-700 mb-4 flex items-center justify-center gap-2">
+                📋 Bảng Vàng Thành Tích
+            </h3>
+            <div id="leaderboard-list" class="space-y-2 max-h-40 overflow-y-auto pr-2">
+                <!-- JS Render -->
+            </div>
+        </div>
+
+        <button onclick="location.reload()" class="btn-pixar w-full py-3 text-xl font-bold">
+            🔄 Chơi lại từ đầu
+        </button>
+    </div>
+
+    <script>
+        const questions = [
+            // MỨC 1: Nhận biết (5 câu - 20s) - Cấu tạo, So sánh cơ bản, Hỗn số cơ bản
+            { level: 1, time: 20, q: "Hỗn số {{3 7/10}} được viết thành số thập phân là:", options: ["3,07", "3,7", "37,0", "0,37"], correct: 1, exp: "Hỗn số có phần nguyên là 3, phần phân số là {{7/10}}. Viết thành số thập phân ta giữ nguyên phần nguyên, phẩy một cái rồi viết phần phân số. Kết quả là 3,7 con nhé!" },
+            { level: 1, time: 20, q: "Dấu thích hợp điền vào chỗ chấm: 12,050 ... 12,05", options: [">", "<", "=", "Không so sánh được"], correct: 2, exp: "Số thập phân khi thêm hoặc bớt các chữ số 0 ở tận cùng bên phải phần thập phân thì giá trị không thay đổi. Vậy 12,050 = 12,05." },
+            { level: 1, time: 20, q: "Số thập phân nào lớn nhất trong các số sau?", options: ["7,8", "7,08", "7,801", "7,081"], correct: 2, exp: "Các số đều có phần nguyên là 7. So sánh hàng phần mười: 8 > 0. So sánh tiếp 7,8 (tức là 7,800) và 7,801 ở hàng phần nghìn: 1 > 0. Nên 7,801 lớn nhất!" },
+            { level: 1, time: 20, q: "Phần nguyên của số thập phân 45,098 là:", options: ["45", "098", "450", "98"], correct: 0, exp: "Trong số thập phân, phần đứng trước dấu phẩy gọi là phần nguyên. Vậy phần nguyên là 45." },
+            { level: 1, time: 20, q: "5m 2dm viết dưới dạng số thập phân có đơn vị là mét (m):", options: ["5,2 m", "5,02 m", "52 m", "0,52 m"], correct: 0, exp: "Đổi sang hỗn số: 5m 2dm = {{5 2/10}} m. Từ hỗn số này, ta viết thành số thập phân là 5,2 m." },
+            
+            // MỨC 2: Hiểu (7 câu - 30s) - Đổi đơn vị qua Hỗn số
+            { level: 2, time: 30, q: "4 kg 50 g = ... kg. Số thích hợp điền vào là:", options: ["4,5 kg", "4,05 kg", "4,005 kg", "450 kg"], correct: 1, exp: "Vì 1kg = 1000g nên 50g = {{50/1000}} kg. Ta có hỗn số {{4 50/1000}} kg. Viết thành số thập phân là 4,050 kg hay 4,05 kg." },
+            { level: 2, time: 30, q: "Đoạn đường dài 12 km 5 m. Viết dưới dạng km là:", options: ["12,5 km", "12,05 km", "12,005 km", "125 km"], correct: 2, exp: "Ta đổi ra hỗn số: 12 km 5 m = {{12 5/1000}} km. Viết ra số thập phân là 12,005 km." },
+            { level: 2, time: 30, q: "So sánh độ dài: 6m 7cm ... 6,7m", options: [">", "<", "=", "Không thể so sánh"], correct: 1, exp: "Đổi 6m 7cm = {{6 7/100}} m = 6,07 m. So sánh: 6,07 < 6,7. Nên điền dấu < con nhé!" },
+            { level: 2, time: 30, q: "2 tấn 34 kg = ... tấn?", options: ["2,34 tấn", "2,034 tấn", "2,0034 tấn", "234 tấn"], correct: 1, exp: "1 tấn = 1000 kg. Vậy 34 kg = {{34/1000}} tấn. Hỗn số là {{2 34/1000}} tấn. Chuyển thành số thập phân là 2,034 tấn." },
+            { level: 2, time: 30, q: "Sắp xếp độ dài từ bé đến lớn: 2,5m ; 2m 5cm ; 2,055m", options: ["2m 5cm ; 2,055m ; 2,5m", "2m 5cm ; 2,5m ; 2,055m", "2,055m ; 2m 5cm ; 2,5m", "2,5m ; 2,055m ; 2m 5cm"], correct: 0, exp: "Đổi 2m 5cm = {{2 5/100}} m = 2,05m. Ta so sánh: 2,05 < 2,055 < 2,5. Vậy thứ tự là: 2m 5cm ; 2,055m ; 2,5m." },
+            { level: 2, time: 30, q: "Khỉ con có 3500 g chuối. Đổi ra ki-lô-gam ta được:", options: ["35 kg", "3,5 kg", "0,35 kg", "350 kg"], correct: 1, exp: "3500 g = 3000 g + 500 g = 3 kg 500 g. Đổi ra hỗn số: {{3 500/1000}} kg. Viết thành số thập phân là 3,500 kg hay 3,5 kg." },
+            { level: 2, time: 30, q: "Hỗn số {{15 3/100}} m được viết dưới dạng số thập phân là:", options: ["15,3 m", "15,03 m", "15,003 m", "1,53 m"], correct: 1, exp: "Phần nguyên là 15. Phần phân số là {{3/100}} (hàng phần trăm). Viết thành số thập phân là 15,03 m." },
+
+            // MỨC 3: Vận dụng (8 câu - 40s) - So sánh nâng cao, Bài toán lời văn không tính toán
+            { level: 3, time: 40, q: "Tìm số thập phân x biết: 5,6 < x < 5,7 (Biết x có 2 chữ số ở phần thập phân)", options: ["5,60", "5,71", "5,65", "5,06"], correct: 2, exp: "Ta thêm số 0 để dễ so sánh: 5,60 < x < 5,70. Số nằm giữa có thể là 5,61; 5,62... đến 5,69. Trong đáp án chỉ có 5,65 là đúng!" },
+            { level: 3, time: 40, q: "Khẳng định nào sau đây là SAI?", options: ["12m 5dm = 12,5m", "3kg 5g = 3,5kg", "7km 20m = 7,02km", "2 tấn 50kg = 2,05 tấn"], correct: 1, exp: "Câu B sai. Vì 3kg 5g = {{3 5/1000}} kg = 3,005 kg, chứ không phải 3,5 kg (3,5 kg = 3kg 500g)." },
+            { level: 3, time: 40, q: "Khỉ con nhặt được quả chuối khổng lồ nặng 150g. Cân nặng đó tính bằng kg là:", options: ["1,5 kg", "0,15 kg", "15 kg", "0,015 kg"], correct: 1, exp: "150g = {{150/1000}} kg. Viết dưới dạng phân số là {{150/1000}} kg (vì chưa đủ 1kg). Đổi ra số thập phân là 0,150 kg hay 0,15 kg." },
+            { level: 3, time: 40, q: "Ba bạn Khỉ thi leo cây. A leo được 1m 45cm; B leo được 1,5m; C leo được 1,405m. Ai leo cao nhất?", options: ["Bạn A", "Bạn B", "Bạn C", "Bạn A và B bằng nhau"], correct: 1, exp: "Ta đổi ra mét: A leo 1m 45cm = {{1 45/100}} m = 1,45m. B leo 1,5m. C leo 1,405m. So sánh: 1,5 > 1,45 > 1,405. Vậy B leo cao nhất!" },
+            { level: 3, time: 40, q: "Tìm số tự nhiên x lớn nhất thỏa mãn: 12,45 < x < 15,01", options: ["12", "13", "14", "15"], correct: 2, exp: "Các số tự nhiên nằm giữa 12,45 và 15,01 là: 13, 14, 15. Trong đó số lớn nhất là 15. Vì 15 < 15,01 là đúng! Nên x lớn nhất là 15." },
+            { level: 3, time: 40, q: "Phân số {{25/4}} m viết dưới dạng số thập phân là:", options: ["25,4 m", "6,14 m", "6,25 m", "0,25 m"], correct: 2, exp: "Ta đổi phân số thành hỗn số: 25 chia 4 được 6 dư 1, tức là {{6 1/4}} m. Ta quy đồng phần phân số: {{1/4}} = {{25/100}}. Vậy hỗn số là {{6 25/100}} m = 6,25 m." },
+            { level: 3, time: 40, q: "Điền dấu: 5km 2m ... 5,02km", options: [">", "<", "=", "Không so sánh được"], correct: 1, exp: "Đổi 5km 2m = {{5 2/1000}} km = 5,002 km. So sánh: 5,002 < 5,020. Nên ta điền dấu <." },
+            { level: 3, time: 40, q: "Có 3 giỏ chuối: Giỏ A nặng 5,05kg; Giỏ B nặng 5kg 50g; Giỏ C nặng 5,5kg. Khẳng định nào ĐÚNG?", options: ["Giỏ A nặng hơn Giỏ B", "Giỏ B và Giỏ C nặng bằng nhau", "Giỏ A và Giỏ B nặng bằng nhau", "Giỏ C nhẹ nhất"], correct: 2, exp: "Đổi Giỏ B: 5kg 50g = {{5 50/1000}} kg = 5,050 kg = 5,05 kg. Vậy Giỏ A và Giỏ B có cân nặng bằng nhau!" }
+        ];
+
+        // --- AUDIO ENGINE (Sử dụng Web Audio API để tạo âm thanh trực tiếp) ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'correct') {
+                // Tiếng Ting vui tai
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            } else if (type === 'wrong') {
+                // Tiếng Boop nhẹ nhàng
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        // --- GLOBAL VARIABLES ---
+        let playerName = "";
+        let score = 0;
+        let currentQIndex = 0;
+        let timeLeft = 0;
+        let timerInterval;
+        const totalQuestions = questions.length;
+
+        function formatMath(text) {
+            // Hàm chuyển đổi cú pháp {{A B/C}} hoặc {{A/B}} thành HTML phân số
+            let res = text.replace(/\{\{(\d+)\s+(\d+)\/(\d+)\}\}/g, '<span class="mix"><span class="mix-int">$1</span><span class="frac"><span class="num">$2</span><span class="den">$3</span></span></span>');
+            res = res.replace(/\{\{(\d+)\/(\d+)\}\}/g, '<span class="frac"><span class="num">$1</span><span class="den">$2</span></span>');
+            return res;
+        }
+
+        // Bảng xếp hạng lưu trong memory (Mảng giả lập)
+        let leaderboard = [
+            { name: "Khỉ Vàng", score: 180 },
+            { name: "Khỉ Đột", score: 150 },
+            { name: "Tôn Ngộ Không", score: 120 }
+        ];
+
+        async function getAIFeedback(question, options, selectedIndex, correctIndex, fallbackExp) {
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const isCorrect = selectedIndex === correctIndex;
+            const studentAnswerText = selectedIndex === -1 ? "Hết giờ (không chọn đáp án)" : options[selectedIndex];
+            const correctAnswerText = options[correctIndex];
+
+            // Cấu hình vai trò cho AI
+            const systemPrompt = `Bạn là "Cô Tiến AI", một cô giáo Toán lớp 5 ảo, thân thiện, vui tính trong trò chơi "Hành Trình Khỉ Con". Học sinh đóng vai chú khỉ đi nhặt chuối.
+Nhiệm vụ: Giải thích ngắn gọn (2-3 câu) tại sao đáp án đúng lại đúng, hoặc phân tích nhẹ nhàng tại sao học sinh sai để các em hiểu bài.
+YÊU CẦU BẮT BUỘC VỀ ĐỊNH DẠNG TOÁN HỌC:
+- Xưng "Cô", gọi học sinh là "Khỉ con" hoặc "con".
+- NẾU CÓ phân số, BẮT BUỘC dùng cú pháp: {{a/b}} (VD: {{3/10}}).
+- NẾU CÓ hỗn số, BẮT BUỘC dùng cú pháp: {{a b/c}} (VD: {{2 5/100}}).
+Không dùng dấu gạch chéo thông thường cho phân số để hệ thống của game hiển thị đúng công thức.`;
+
+            const userPrompt = `Câu hỏi: ${question}\nĐáp án đúng: ${correctAnswerText}\nHọc sinh chọn: ${studentAnswerText}\nKết quả: ${isCorrect ? 'Đúng' : 'Sai'}. Hãy nhận xét, động viên và giải thích kiến thức (đổi đơn vị, so sánh số thập phân).`;
+
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.candidates && result.candidates[0].content.parts[0].text) {
+                    return result.candidates[0].content.parts[0].text;
+                }
+                return fallbackExp;
+            } catch (error) {
+                // Nếu lỗi mạng, dùng lại lời giải thích cố định có sẵn
+                return "Mạng hơi chậm nên Cô Tiến dùng lời giải thích chuẩn bị sẵn nhé: " + fallbackExp;
+            }
+        }
+
+        // --- GAME LOGIC FUNCTIONS ---
+        function startGame() {
+            const inputName = document.getElementById('player-name').value.trim();
+            if(!inputName) {
+                // Hiệu ứng rung nhẹ báo lỗi
+                const inputEl = document.getElementById('player-name');
+                inputEl.classList.add('border-red-500');
+                setTimeout(() => inputEl.classList.remove('border-red-500'), 500);
+                return;
+            }
+            playerName = inputName;
+            
+            // Init Audio on first user interaction
+            initAudio();
+
+            // Setup UI
+            document.getElementById('display-name').innerText = playerName;
+            score = 0;
+            currentQIndex = 0;
+            updateScoreUI();
+
+            // Switch Screen
+            switchScreen('start-screen', 'game-screen');
+            loadQuestion();
+        }
+
+        function switchScreen(hideId, showId) {
+            document.getElementById(hideId).classList.add('hidden-screen');
+            document.getElementById(showId).classList.remove('hidden-screen');
+        }
+
+        function loadQuestion() {
+            const qData = questions[currentQIndex];
+            
+            // Cập nhật Header
+            document.getElementById('question-counter').innerText = `Câu ${currentQIndex + 1}/${totalQuestions}`;
+            const progressPercent = (currentQIndex / totalQuestions) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+            // Mức độ
+            const badge = document.getElementById('level-badge');
+            if (qData.level === 1) {
+                badge.innerText = "Mức 1: Nhận biết (20s)";
+                badge.className = "px-2 py-1 bg-green-100 text-green-700 rounded-lg";
+            } else if (qData.level === 2) {
+                badge.innerText = "Mức 2: Hiểu (30s)";
+                badge.className = "px-2 py-1 bg-blue-100 text-blue-700 rounded-lg";
+            } else {
+                badge.innerText = "Mức 3: Vận dụng (40s)";
+                badge.className = "px-2 py-1 bg-purple-100 text-purple-700 rounded-lg";
+            }
+
+            // Hiển thị câu hỏi
+            document.getElementById('question-text').innerHTML = formatMath(qData.q);
+
+            // Render Options
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = "";
+            qData.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full p-4 text-lg font-bold text-slate-700 text-center cursor-pointer";
+                btn.innerHTML = formatMath(opt);
+                btn.onclick = () => handleAnswer(index);
+                optsContainer.appendChild(btn);
+            });
+
+            // Start Timer
+            startTimer(qData.time);
+        }
+
+        function startTimer(seconds) {
+            clearInterval(timerInterval);
+            timeLeft = seconds;
+            const fullTime = seconds;
+            const circle = document.getElementById('timer-circle');
+            
+            updateTimerUI(fullTime);
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI(fullTime);
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleAnswer(-1); // -1 nghĩa là hết giờ
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI(fullTime) {
+            document.getElementById('timer-text').innerText = timeLeft;
+            
+            // Calculate stroke-dashoffset (226 is approx 2 * pi * 36)
+            const circumference = 226;
+            const offset = circumference - (timeLeft / fullTime) * circumference;
+            document.getElementById('timer-circle').style.strokeDashoffset = offset;
+
+            // Thay đổi màu khi sắp hết giờ
+            if (timeLeft <= 5) {
+                document.getElementById('timer-text').classList.add('text-red-500');
+            } else {
+                document.getElementById('timer-text').classList.remove('text-red-500');
+            }
+        }
+
+        async function handleAnswer(selectedIndex) {
+            clearInterval(timerInterval); // Dừng thời gian
+            const qData = questions[currentQIndex];
+            const isCorrect = selectedIndex === qData.correct;
+            
+            // Disable tất cả các nút
+            const buttons = document.getElementById('options-container').children;
+            for(let i=0; i<buttons.length; i++) {
+                buttons[i].disabled = true;
+                if(i === qData.correct) {
+                    buttons[i].classList.add('correct');
+                } else if(i === selectedIndex && !isCorrect) {
+                    buttons[i].classList.add('wrong');
+                }
+            }
+
+            // Chấm điểm và âm thanh
+            let feedbackTitle = "";
+            let feedbackSub = "";
+
+            if (isCorrect) {
+                playSound('correct');
+                const points = qData.level * 10; // Mức 1: 10đ, Mức 2: 20đ, Mức 3: 30đ
+                score += points;
+                updateScoreUI();
+                feedbackTitle = "Tuyệt vời quá! 🎉";
+                feedbackSub = `Khỉ con nhận được ${points} quả chuối 🍌`;
+            } else {
+                playSound('wrong');
+                feedbackTitle = selectedIndex === -1 ? "Hết giờ mất rồi! ⏰" : "Chưa chính xác rồi! 😢";
+                feedbackSub = "Không sao, cùng nghe Cô Tiến giải thích nhé.";
+            }
+
+            // Vô hiệu hóa nút Tiếp tục trong lúc đợi AI
+            const feedbackModal = document.getElementById('feedback-modal');
+            const nextBtn = feedbackModal.querySelector('button');
+            nextBtn.disabled = true;
+            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // Hiển thị Feedback Modal với trạng thái Loading
+            showFeedback(feedbackTitle, feedbackSub, "<span class='typing-indicator font-bold text-blue-600'>Cô Tiến AI đang phân tích câu trả lời của con</span>", isCorrect);
+
+            // Lấy lời giải thích từ AI
+            const aiExplanation = await getAIFeedback(qData.q, qData.options, selectedIndex, qData.correct, qData.exp);
+
+            // Cập nhật lại Modal với nội dung AI đã sinh ra (có format toán học)
+            document.getElementById('feedback-explanation').innerHTML = formatMath(aiExplanation);
+            
+            // Mở khóa nút Tiếp tục
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        function updateScoreUI() {
+            document.getElementById('score').innerText = score;
+        }
+
+        function showFeedback(title, sub, exp, isCorrect) {
+            document.getElementById('feedback-title').innerText = title;
+            document.getElementById('feedback-title').className = `text-2xl font-black mb-1 ${isCorrect ? 'text-green-600' : 'text-orange-500'}`;
+            document.getElementById('feedback-subtitle').innerText = sub;
+            document.getElementById('feedback-explanation').innerHTML = formatMath(exp);
+            document.getElementById('feedback-modal').classList.remove('hidden-screen');
+        }
+
+        function nextQuestion() {
+            document.getElementById('feedback-modal').classList.add('hidden-screen');
+            currentQIndex++;
+            
+            if (currentQIndex < totalQuestions) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            switchScreen('game-screen', 'end-screen');
+            document.getElementById('final-player-name').innerText = playerName;
+            document.getElementById('final-score').innerText = score;
+            
+            // Nhận xét của Cô Tiến
+            const finalMsgEl = document.getElementById('final-message');
+            if (score > 400) {
+                finalMsgEl.innerText = "Wow! Con là thần đồng Toán Học lớp 5! Cô Tiến cực kỳ tự hào về con! 🌟";
+                finalMsgEl.className = "mt-4 text-green-600 font-bold text-lg";
+            } else if (score > 250) {
+                finalMsgEl.innerText = "Làm tốt lắm! Con nắm khá vững kiến thức Số thập phân. Cố gắng thêm chút nữa nhé! 👍";
+                finalMsgEl.className = "mt-4 text-blue-600 font-bold text-lg";
+            } else {
+                finalMsgEl.innerText = "Không sao đâu con! Ôn tập lại kiến thức đổi đơn vị đo và làm lại nhé. Cô tin con sẽ làm tốt hơn! 💪";
+                finalMsgEl.className = "mt-4 text-orange-600 font-bold text-lg";
+            }
+
+            // Cập nhật và hiển thị Bảng xếp hạng
+            updateLeaderboard();
+        }
+
+        function updateLeaderboard() {
+            // Thêm player hiện tại vào mảng
+            leaderboard.push({ name: playerName, score: score });
+            
+            // Sắp xếp giảm dần theo điểm
+            leaderboard.sort((a, b) => b.score - a.score);
+            
+            // Lấy top 5
+            const top5 = leaderboard.slice(0, 5);
+
+            // Render
+            const listEl = document.getElementById('leaderboard-list');
+            listEl.innerHTML = "";
+            
+            top5.forEach((player, index) => {
+                const item = document.createElement('div');
+                // Highlight người chơi hiện tại
+                const isCurrent = player.name === playerName && player.score === score;
+                const bgClass = isCurrent ? "bg-orange-100 border-orange-300 border-2" : "bg-white border-slate-200 border";
+                
+                let medal = "🏅";
+                if(index === 0) medal = "🥇";
+                if(index === 1) medal = "🥈";
+                if(index === 2) medal = "🥉";
+
+                item.className = `flex justify-between items-center p-3 rounded-xl ${bgClass}`;
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">${medal}</span>
+                        <span class="font-bold text-slate-700">${player.name}</span>
+                    </div>
+                    <div class="font-black text-orange-500">
+                        ${player.score} 🍌
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
